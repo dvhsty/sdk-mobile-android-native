@@ -39,7 +39,6 @@ public class Flow {
 
     private static final String TAG = "Flow";
 
-
     private final TenantConfiguration tenantConfiguration;
     private final CookieHandler cookieHandler;
 
@@ -136,7 +135,9 @@ public class Flow {
                 JSONObject decodedResponse = new JSONObject(body);
 
                 if (!decodedResponse.has(ERROR_KEY)) {
-                    final RuntimeException innerException = new RuntimeException(String.format("Workflow error: %s is null", ERROR_KEY));
+                    final RuntimeException innerException = new RuntimeException(
+                        String.format("Workflow error: %s is null", ERROR_KEY)
+                    );
                     throw new NativeSDKError.UnknownError(innerException);
                 }
 
@@ -144,19 +145,25 @@ public class Flow {
                 final String errorDescription = decodedResponse.optString(ERROR_DESCRIPTION_KEY);
                 throw new NativeSDKError.WorkflowError(error, errorDescription);
             } catch (JSONException e) {
-                final String message = String.format("Workflow error - could not deserialize response: %s", e.getMessage());
+                final String message = String.format(
+                    "Workflow error - could not deserialize response: %s",
+                    e.getMessage()
+                );
                 throw new NativeSDKError.UnknownError(new RuntimeException(message));
             }
         }
 
         if (statusCode == STATUS_CODE_INTERNAL_SERVER_ERROR) {
             Log.d(TAG, "Ensure that authentication client has entry URL configured.");
-            throw new NativeSDKError.UnknownError(new RuntimeException("Server failed to answer - 500 status code received"));
+            throw new NativeSDKError.UnknownError(
+                new RuntimeException("Server failed to answer - 500 status code received")
+            );
         }
 
-
         if (!response.getHeaders().containsKey("location")) {
-            throw new NativeSDKError.UnknownError(new RuntimeException("Expected to find Location header but it was not found "));
+            throw new NativeSDKError.UnknownError(
+                new RuntimeException("Expected to find Location header but it was not found ")
+            );
         }
     }
 
@@ -165,7 +172,9 @@ public class Flow {
         final Uri redirectUri = Uri.parse(response.getHeader("location"));
         final String sessionId = redirectUri.getQueryParameter("session_id");
         if (sessionId == null || sessionId.isBlank()) {
-            throw new NativeSDKError.UnknownError(new RuntimeException("Failed to start session: session_id missing or blank"));
+            throw new NativeSDKError.UnknownError(
+                new RuntimeException("Failed to start session: session_id missing or blank")
+            );
         }
         return sessionId;
     }
